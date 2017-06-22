@@ -1,0 +1,10 @@
+
+vendor/
+
+.env
+
+*.xml
+
+.idea/workspace.xml
+
+.idea/workspace.xml

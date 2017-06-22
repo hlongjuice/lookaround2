@@ -1,0 +1,410 @@
+<html> <head> <title>Login | MailChimp - email marketing made easy</title> <link rel="canonical" href="https://login.mailchimp.com/">  <meta name="apple-itunes-app" content="app-id=366794783"> <meta charset="utf-8"> <meta name="copyright" content="Copyright (c) 2017 MailChimp. All Rights Reserved."> <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5"> <meta name="apple-mobile-web-app-capable" content="yes"> <meta name="apple-mobile-web-app-status-bar-style" content="black"> <meta content="//mailchimp.com/browserconfig.xml" name="msapplication-config"> <meta content="#52BAD5" name="msapplication-TileColor"> <meta content="//static.mailchimp.com/web/favicon.png" name="msapplication-TileImage"> <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,600|Open+Sans:300italic,400italic,600italic,700italic,700,300,600,400|Roboto:300,400,700" rel="stylesheet" type="text/css"> <link rel="stylesheet" type="text/css" href="/release/11.7.716/css/less/theone.css"> <link rel="stylesheet" type="text/css" href="/release/11.7.716/css/less/pages.css"> <link href="/images/apple-touch-icon-180x180.png" rel="apple-touch-icon" sizes="180x180"> <link href="/images/touch-icon-192x192.png" rel="icon" sizes="192x192"> <link rel="shortcut icon" href="/favicon.ico">  <script type="text/javascript">
+var xhr_open = XMLHttpRequest.prototype.open;
+XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+    xhr_open.call(this, method, url, async, user, password);
+    if (async === true && url.match(/^\/(?!\/)+/)) {
+        this.setRequestHeader('X-CSRF-Token', '24b55730a2543cbef02d7f207a5198dc4de14214');
+    }
+}
+</script>  <script src="/release/11.7.716/js/dojo/dojo.js" data-dojo-config="parseOnLoad: true, usePlainJson: true, isDebug: false"></script> <script src="/release/11.7.716/js/dojo/mccommon.js"></script> <script type="text/javascript">
+    dojo.require("mojo.utils");
+    require(["mojo/widgets/Dialog"]);
+    // Leaving it globally since we used it around
+    var rootUrl = '/';
+
+    require([
+        "dojo/_base/lang",
+        "mojo/user",
+        "mojo/context"
+    ], function(lang, user, context) {
+        // Add defaults to the actual modules.
+
+        lang.mixin(context, {
+            'rootUrl': '/',
+
+            'proxyBaseUrl': "https:\/\/d2q0qd5iz04n9u.cloudfront.net\/_ssl\/proxy.php",
+
+            'listManageDomain': "list-manage.com",
+
+            'pusherKey': "74d7188a67461f12439a",
+
+            'cdnImagesDomain': "cdn-images.mailchimp.com",
+
+            'galleryDomain': "gallery.mailchimp.com",
+
+            'avestaEnvironment': "prod"        });
+
+            });
+</script>    <script type="text/javascript">
+    dojo.registerModulePath('mailchimp', '../mailchimp');
+    dojo.require('dojo.parser');
+    dojo.require("dojo.NodeList-traverse");
+    dojo.require('dojo.cookie');
+    dojo.require('dijit.form.CheckBox');
+    dojo.require('dojo/dom');
+
+    dojo.addOnLoad(function() {
+        // Show password code that works for more than one password field in the page.
+        if(dojo.query('[name="show-password"]').length > 0) {
+            var input_password_arr = dojo.query('input[type="password"]');
+            dojo.forEach(dojo.query('[name="show-password"]'),function(el, i){
+                    el.index = i;
+                    dojo.connect(el, "click", function(evt){
+                        showPass(input_password_arr, evt);
+                    });//eo onclick evt;
+            });
+        }
+
+        //If more than one password field is in the page this function
+        // allows to keep the behaviors of the show password tick separate from one another
+        function showPass(input_password, ev){
+            var el = ev.target;
+            var showPassword = dojo.query('[data-mc-el="showPassword"]')[0];
+            dojo.forEach(input_password, function(pwdinput, i){
+                if(i===el.index) {
+                    if(el.checked){
+                        dojo.attr(pwdinput,"type","text");
+                        dojo.attr(pwdinput,"autocomplete","off");
+                        dojo.attr(pwdinput,"autocorrect","off");
+                        dojo.attr(pwdinput,"autocapitalize","off");
+                        dojo.attr(pwdinput,"spellcheck","false");
+                        pwdinput.focus();
+                        // show/hide password toggle on signup pg
+                        if(showPassword){
+                            showPassword.innerHTML = "Hide";
+                            dojo.addClass(showPassword, "c-showPassword--hideIcon");
+                            dojo.removeClass(showPassword, "c-showPassword--showIcon");
+                        }
+                    }
+                    else{
+                        dojo.attr(pwdinput,"type","password"); pwdinput.focus();
+                        // show/hide password toggle on signup pg
+                        if(showPassword){
+                            showPassword.innerHTML = "Show";
+                            dojo.addClass(showPassword, "c-showPassword--showIcon");
+                            dojo.removeClass(showPassword, "c-showPassword--hideIcon");
+                        }
+                    }
+                }
+            }); //eo forEach
+        }
+
+                
+        require(["dojo/cookie"], function(cookie){
+            if ( !cookie.isSupported() )  dojo.byId('no-cookies').style.display = '';
+            if(dojo.byId('account-form')){dojo.byId('no-cookies').style.display="none";}
+        });
+        
+        document.onkeypress=function(e){
+            var keycode = (e==null) ? keycode = event.keyCode : ((keycode = e.which));
+            var targetEl;
+            var shift_status = false;
+            if(dojo.isIE){
+                targetEl = event.srcElement;
+                shift_status = event.shiftKey;
+            }else{
+                if(e.target){
+                    targetEl = e.target;
+                }else if(e.srcElement){
+                    targetEl = e.srcElement;
+                }
+
+                if(e.shiftKey){
+                    shift_status = e.shiftKey;
+                }else if(e.modifiers){
+                    shift_status = !!(e.modifiers & 4);
+                }
+            }
+            if((keycode >= 65 && keycode <= 90 ) || (keycode >= 97 && keycode <= 122) && shift_status){
+                dojo.addClass(targetEl, 'caps');
+            }else{
+                dojo.removeClass(targetEl, 'caps');
+            }
+        }
+
+            });
+
+
+    /** Password Requirements **/
+    require([
+        "dojo/dom",
+        "dojo/query",
+        "dojo/dom-class",
+        "dojo/dom-attr",
+        "dojo/dom-style",
+        "dojo/on",
+        "dijit/registry",
+        "mojo/utils",
+        "dojo/ready"
+    ], function(dom, query, domClass, domAttr, domStyle, on, registry, utils, ready){
+
+        // At least one LOWERCASE character:
+        var lowerCasePattern = /^(?=.*[a-z]).+$/;
+
+        // At least one UPPERCASE character:
+        var upperCasePattern = /^(?=.*[A-Z]).+$/;
+
+        // At least one NUMBER:
+        var numberPattern = /^(?=.*[\d]).+$/;
+
+        // At least one SPECIAL character:
+        var specialCharacterPatter = /([-+=_!@#$%^&*.,;:'\"<>/?`~\[\]\(\)\{\}\\\|\s])/;
+
+        // At least 8 characters in the screen:
+        var characterCountPattern = /^.{8,}/;
+
+        // Flag to keep track if password is less than 50 characters:
+        var isLessThan50 = true;
+
+        ready(function(){
+
+            var pwd = dom.byId("new_password");
+            var passReq = query(".password-requirements")[0];
+
+            if(dom.byId("create-account")){
+                var createBtn = dom.byId("create-account");
+            }
+
+            if(dom.byId("join-account")){
+                var joinBtn = dom.byId("join-account");
+            }
+
+            if(registry.byId("reset-password")){
+                var resetBtn = registry.byId("reset-password");
+                resetBtn.setDisabled(true);
+            }
+
+            var lowercaseChar = query(".lowercase-char")[0];
+            var uppercaseChar = query(".uppercase-char")[0];
+            var numberChar = query(".number-char")[0];
+            var specialChar = query(".special-char")[0];
+            var _8Char = query(".8-char")[0];
+            var plus50 = query(".plus-50")[0];
+
+            // Attach event for signup form
+            if(dom.byId("signup-form")) {
+                checkRequirements();
+                on(dom.byId("signup-form"), "submit", function (e) {
+                    // Add loading animation to button
+                    utils.toggleButtonLoadingState(createBtn);
+                });
+            }
+
+            // Attach event for invite form
+            if(dom.byId("login-form")) {
+                on(dom.byId("login-form"), "submit", function (e) {
+                    // Add loading animation to button
+                    utils.toggleButtonLoadingState(joinBtn);
+                });
+            }
+
+            // Attach event for reset password form
+            if(dom.byId("reset-password-form")) {
+                on(dom.byId("reset-password-form"), "submit", function (e) {
+                    // Add loading animation to button
+                    utils.toggleButtonLoadingState(resetBtn);
+                });
+            }
+
+            // focus/focusout events for new password
+            if(passReq && !domClass.contains(passReq, "always-open")){
+                on(dom.byId("new_password"), "focus", function(){
+                    domClass.add(passReq, "open");
+                });
+
+                on(dom.byId("new_password"), "focusout", function(){
+                    domClass.remove(passReq, "open");
+                });
+            }
+
+           // Event for change of input (typing, pasting)
+            if(pwd){ on(pwd, "input", function(e) { checkRequirements(); }); }
+
+            function checkRequirements(){
+                toggleRequirements(pwd, lowerCasePattern, lowercaseChar);
+                toggleRequirements(pwd, upperCasePattern, uppercaseChar);
+                toggleRequirements(pwd, numberPattern, numberChar);
+                toggleRequirements(pwd, specialCharacterPatter, specialChar);
+                toggleRequirements(pwd, characterCountPattern, _8Char);
+
+                // Check if password is 50 chars or longer
+                if(pwd.value.length > 50){
+                    domStyle.set(plus50, "opacity", "1");
+                    isLessThan50 = false;
+                }else{
+                    domStyle.set(plus50, "opacity", "0");
+                    isLessThan50 = true;
+                }
+
+                if( lowerCasePattern.test(pwd.value) &&
+                        upperCasePattern.test(pwd.value) &&
+                        numberPattern.test(pwd.value) &&
+                        specialCharacterPatter.test(pwd.value) &&
+                        characterCountPattern.test(pwd.value) &&
+                        isLessThan50
+                        ){
+                    domClass.remove(query(".password-ok")[0], "hide");
+                    domClass.add(passReq, "hide");
+                    if(createBtn){ domAttr.remove(createBtn, "disabled"); }
+                    if(joinBtn){ domAttr.remove(joinBtn, "disabled"); }
+                    if(resetBtn){ resetBtn.setDisabled(false); }
+                }else{
+                    domClass.add(query(".password-ok")[0], "hide");
+                    if(createBtn){ domAttr.set(createBtn, "disabled", "disabled"); }
+                    if(joinBtn){ domAttr.set(joinBtn, "disabled", "disabled"); }
+                    if(resetBtn){ resetBtn.setDisabled(true); }
+                    domClass.remove(passReq, "hide");
+                }
+            }
+
+            function toggleRequirements(/*input*/pwd, /*RegEx*/regEx, /*element*/el){
+                if(regEx.test(pwd.value) ){
+                    domClass.add(el, "completed");
+                }else{
+                    domClass.remove(el, "completed");
+                }
+            }
+
+        });
+    });
+
+</script>  <script>
+    (function(i,s,o,g,r,a,m){ i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments) },i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    var dimensions = {
+        USER_ID: 'dimension8',
+        TRACKING_VERSION: 'dimension9'
+    };
+
+        ga("create","UA-329148-81","auto",{
+        allowLinker:!0
+    });
+    
+    ga("set", dimensions.TRACKING_VERSION, "1");
+
+    ga("require","linker");
+    ga("linker:autoLink",[/(.*\.)?mailchimp(app)?\.com$/],!1,!0);
+
+    ga("send","pageview", []);
+
+    // Save tracking id and client id to a cookie so we can use them server side
+    require(["mojo/utils"], function(utils) {
+        if (!utils.getCookie('_mcga')) {
+            ga(function(tracker) {
+                var gaData = {};
+                gaData.tid = tracker.get('trackingId');
+                gaData.cid = tracker.get('clientId');
+                document.cookie = '_mcga='+ JSON.stringify(gaData) +';path=/;domain=.mailchimp.com';
+            });
+        }
+    });
+</script>    <script type="text/javascript">
+    dojo.require('dijit.form.CheckBox');
+    dojo.require("dojo.NodeList-fx");
+    dojo.addOnLoad(function() {
+
+        // Show warning messages if browser is not supported or out of date.
+        var badbrowser = false;
+        var browsermsg = "";
+        if(dojo.isIE <= 9) {
+            if(dojo.isIE == 9) {
+                browsermsg = '<h4>Internet Explorer 9 is not actively supported in MailChimp.</h4>';
+                browsermsg += '<p class="full-width">The latest versions of <a href="http://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">Chrome</a>, <a href="http://www.getfirefox.com/" target="_blank" rel="noopener noreferrer">Firefox</a> and Internet Explorer all play nice with the Chimp. We recommend switching to one of those.</p>';
+            } else {
+                browsermsg = '<h4>Whoa there! Internet Explorer 8 and below do not work with MailChimp.</h4>';
+                browsermsg += '<p class="full-width">The latest versions of <a href="http://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">Chrome</a>, <a href="http://www.getfirefox.com/" target="_blank" rel="noopener noreferrer">Firefox</a> and Internet Explorer all play nice with the Chimp. To log in, you&rsquo;ll need to use one of those.</p>';
+                dojo.replaceClass("browser-warning", "error", "warning");
+            }
+            badbrowser = true;
+        }
+        if(dojo.isSafari < 7) {
+            var badbrowser = true;
+            browsermsg = '<h4>This version of Safari is not actively supported in MailChimp.</h4>';
+            browsermsg += '<p class="full-width">Most things should work, but if you have any problems, we&rsquo;d recommend checking for <a href="https://support.apple.com/en-us/HT201541" target="_blank" rel="noopener noreferrer">software updates</a> or switching to the latest version of <a href="http://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">Chrome</a> or <a href="http://www.getfirefox.com/" target="_blank" rel="noopener noreferrer">Firefox</a>.</p>'
+        }
+        if(dojo.isSafari < 6.1) {
+            var badbrowser = true;
+            browsermsg = '<h4>This version of Safari is not actively supported in MailChimp.</h4>';
+            browsermsg += '<p class="full-width">We recommend switching to the latest version of <a href="http://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">Chrome</a> or <a href="http://www.getfirefox.com/" target="_blank" rel="noopener noreferrer">Firefox</a>.</p>'
+        }
+        if(dojo.isFF < 32) {
+            var badbrowser = true;
+            browsermsg = '<h4>This version of Firefox is not actively supported in MailChimp.</h4>';
+            browsermsg += '<p class="full-width">Most things should work, but if you have any problems, we&rsquo;d recommend <a href="http://www.getfirefox.com/" target="_blank" rel="noopener noreferrer">updating Firefox</a> or switching to the latest version of <a href="http://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">Chrome</a>.</p>'
+        }
+        if(dojo.isChrome < 38) {
+            var badbrowser = true;
+            browsermsg = '<h4>This version of Chrome is not actively supported in MailChimp.</h4>';
+            browsermsg += '<p class="full-width">Most things should work, but if you have any problems, we&rsquo;d recommend <a href="http://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">updating Chrome</a> or switching to the latest version of <a href="http://www.getfirefox.com/" target="_blank" rel="noopener noreferrer">Firefox</a>.</p>'
+        }
+        if(badbrowser){
+            dojo.byId('browser-warning').style.display = '';
+            dojo.query('#browser-warning .media-body')[0].innerHTML = browsermsg;
+        }
+
+                var timediff = Math.abs((new Date()).getTime() - 1493290499000);
+        if (timediff >  (22*60*1000)) {
+            insertNode = dojo.query('.login-field')[0];
+            dojo.place('<div id="empty-error" class="feedback-block warning margin--lv5 !margin-left-right--lv0 !margin-top--lv0">'+ '<div class="lastUnit size1of1">'+ '<div class="media">'+ '<div class="media-image">'+ '<span class="freddicon warn-circle"></span>'+ '</div>'+ '<div class="media-body">'+ '<h4>Whoops</h4>'+ '<p>It seems your system clock is set too far into the future. If login continually fails, please adjust your system clock or use <a href="http://en.wikipedia.org/wiki/Network_Time_Protocol" target="_blank" rel="noopener noreferrer">NTP</a></p>'+ '</div>'+ '</div>'+ '</div>'+ '</div>', insertNode, "before");
+        }
+
+        dojo.connect(dojo.byId('forgot-pass'), "onsubmit", function(e) {
+            // Add loading animation to button
+            var button = dojo.query('.forgot-password-button');
+            mojo.utils.toggleButtonLoadingState(button);
+        });
+
+        dojo.connect(dojo.byId('forgot-user'), "onsubmit", function(e) {
+            // Add loading animation to button
+            var button = dojo.query('.forgot-username-button');
+            mojo.utils.toggleButtonLoadingState(button);
+        });
+
+        dojo.connect(dojo.byId('login-form'), "onsubmit", function(e) {
+            // Add loading animation to button
+            var logInBtns = dojo.query('.login-button button');
+            mojo.utils.toggleButtonLoadingState(logInBtns, "Logging in...");
+
+            var errorText = "";
+            if(!dojo.byId('password').value){
+                errorText = 'Looks like you forgot your password there, '+ dojo.byId('username').value + '.';
+            }
+            if(!dojo.byId('username').value){
+                if(errorText == ""){
+                    errorText = "You entered a password but not a username.";
+                } else {
+                    errorText = "You did not enter a username or a password.";
+                }
+            }
+            if(errorText != ""){
+                // Turn off loading state
+                mojo.utils.toggleButtonLoadingState(logInBtns);
+                e.preventDefault();
+                errorText = errorText.replace(/(<([^>]+)>)/ig,"");
+                var n = dojo.byId("empty-error");
+                if(n){
+                    dojo.query("p", n).innerHTML = errorText;
+                } else {
+                    insertNode = dojo.query('.login-field')[0];
+
+                    dojo.place('<div id="empty-error" class="feedback-block warning margin--lv5 !margin-left-right--lv0 !margin-top--lv0">'+ '<div class="lastUnit size1of1">'+ '<div class="media">'+ '<div class="media-image">'+ '<span class="freddicon warn-circle"></span>'+ '</div>'+ '<div class="media-body">'+ '<h4>Whoops</h4>'+ '<p>'+errorText+'</p>'+ '</div>'+ '</div>'+ '</div>'+ '</div>', insertNode, "before");
+                }
+            }
+        });
+
+        dojo.byId('screen-size').value = window.screen.availWidth + 'x' + window.screen.availHeight;
+    });
+</script>   <script type="text/javascript">require(['mojo/views/login/index'], function(Module) {
+                    window._mc = new Module();
+                    window._mc.run();
+                });</script> </head>  <body id="login" class="new_teal mcd bg-login !padding-top--lv0 selfclear overflow-auto"> <div class="line flex"> <div class="unit padding--lv3 !padding-top-bottom--lv0 flex-col full-width-mobile full-width-legacy-ie size1of3">    <div class="c-loginContainer flex-auto padding--lv5 !padding-left-right--lv0 !padding-bottom--lv0 margin--lv5 !margin-left-right--lv0 !margin-bottom--lv0 padding--lv0@xltablet margin--lv0@xltablet" id="login-box">  <div id="browser-warning" class="feedback-block warning" style="display: none;"> <div class="lastUnit size1of1"> <div class="media"> <div class="media-image"><span class="freddicon warn-circle"></span></div> <div class="media-body"></div> </div> </div> </div>  <div id="no-cookies" class="feedback-block warning" style="display: none;"> <div class="lastUnit size1of1 alignc"> <span class="freddicon warn-circle margin--lv2 !margin-top-bottom--lv0 !margin-left--lv0"></span> <span>It looks like you have cookies disabled.</span> <span>Cookies need to be enabled for MailChimp to work properly.</span> </div> </div> <div id="content" class="!margin-bottom--lv8"> <div id="login-form-wrap" class="mc-mini-content centered padding--lv1"> <div class="alignc margin--lv5 !margin-left-right--lv0 !margin-bottom--lv2"> <div class="freddie freddie--login centered"><a href="/" title="Freddie von Chimpenheimer, IV"></a></div> </div> <div class="lastUnit size1of1 overflow-visible flex-shrink-none"> <div id="av-flash-block" class="c-flashBlock">    </div> </div>   <div id="login-content" class="line selfclear !margin-bottom--lv6">  <div class="lastUnit overflow-visible"> <form action="/login/post/" id="login-form" class="c-largeForm" method="POST" novalidate="novalidate"> <input type="hidden" aria-hidden="true" name="referrer" class="av-hidden" value="" id="referrer"> <input type="hidden" aria-hidden="true" name="from" class="av-hidden" value="" id="from"> <input type="hidden" aria-hidden="true" name="auth_token" class="av-hidden" value="" id="auth_token"> <input type="hidden" aria-hidden="true" name="auth_system" class="av-hidden" value="" id="auth_system"> <input type="hidden" aria-hidden="true" name="screen_size" id="screen-size" class="av-hidden">   <div class="!margin-bottom--lv5"> <h1 class="alignc !margin-bottom--lv3">Log In</h1> <p>Need a MailChimp account? <a href="/signup/" title="Signup for a MailChimp account" onclick="ga('send', 'event', window.location.pathname, 'action', 'Create Account From Login');">Create an account</a></p> </div> <fieldset>     <div class="line login-field"> <div class="field-wrapper"> <label for="username" class="">Username</label> <input type="text" name="username" id="username" tabindex="1" autofocus="autofocus" autocorrect="off" autocapitalize="off" class=" av-text" value=""> </div> </div>  <div class="line"> <label for="password" class="float-left ">Password</label> <div class="float-right"> <input type="checkbox" name="show-password" id="show-password" class="hide av-checkbox" value="1"> <label for="show-password" title="Show Password" class="c-showPassword c-showPassword--showIcon cursor-pointer relative" data-mc-el="showPassword">Show</label> </div> </div> <div class="line !margin-bottom--lv3"> <input type="password" name="password" tabindex="2" id="password" maxlength="51" class=" av-password" value=""> </div> 
+                
+                 <div class="line !margin-bottom--lv5"> <button type="submit" value="log in" class="button-large button-wide full-width p1 !margin-bottom--lv5" tabindex="3">Log in</button> <div class="alignc"> <label for="stay-signed-in" class="block !padding--lv0"><input type="checkbox" data-dojo-type="dijit/form/CheckBox" name="stay-signed-in" value="Y" id="stay-signed-in" class="av-checkbox">Keep me logged in</label> </div> </div>  <div class="alignc"> <p class="inline-block margin--lv1 !margin-top-bottom--lv0 !margin-left--lv0"> <a href="/login/forgot-username/">Forgot username?</a> </p> &middot; <p class="inline-block margin--lv1 !margin-top-bottom--lv0 !margin-right--lv0"> <a href="/login/forgot/"> Forgot password?</a> </p> </div> </fieldset> </form> </div>  <script type="text/javascript">
+        document.getElementsByTagName('html')[0].className += " new_teal";
+    </script> </div> </div> </div>  </div>  <div class="hide-print"> <div class="line nofloat-tablet full-width-mobile !margin-bottom--lv6 mar-lr-auto--tablet mc-mini-content padding--lv1 centered"> <p class="lastUnit size1of1 small-meta dim6 full-width"> &copy;2001&ndash;2017 <span>All Rights Reserved. MailChimp® is a registered trademark of The Rocket Science Group.</span> <span class="nowrap link-underline"> <a class="textcolor" href="http://mailchimp.com/legal/privacy" target="_blank" tabindex="-1" onclick="ga('send', 'event', 'dashboard', 'link', 'mailchimp.com/legal/privacy');" rel="noopener noreferrer">Privacy</a> and <a class="textcolor" href="http://mailchimp.com/legal/" target="_blank" tabindex="-1" onclick="ga('send', 'event', 'dashboard', 'link', 'mailchimp.com/legal/');" rel="noopener noreferrer">Terms</a> </span> </p> </div> </div> </div>  <div class="lastUnit flex-col overflow-y !padding-left-right--lv0 hide-mobile hide-legacy-ie full-height-vh size2of3 login-billboard ">
+            <div data-mc-el="loginAnnouncementAnimation" class="full-height" style="display:none; opacity:0;">
+    <a href="https://mailchimp.com/features/facebook-ads/?utm_source=mailchimp_app&utm_campaign=facebook_ads&utm_medium=login_page" class="login-billboard-image block" target="_blank" style="background-image: url(https://s3.amazonaws.com/cdn-images.mailchimp.com/login/phpNyjGe6.jpeg)"></a></div>
+        </div> </div> </body> </html>
